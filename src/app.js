@@ -1,79 +1,24 @@
 import express from "express";
-import {
-  books,
-  searchByTitle,
-  findBookById,
-  getBooksFromDb,
-  getBookOrThrow
-} from "./books.js";
-import {
-  users,
-  findUserById,
-  findByEmail,
-  countAdmins
-} from "./users.js";
+import booksRouter from "./routes/books.router.js";
+import { logger } from "./middlewares/logger.js";
+import { notFound, errorHandler } from "./middlewares/error.js";
 
 const app = express();
 const PORT = 3000;
 
-// Үндсэн route
-app.get("/", (req, res) => {
-  res.json({ message: "Library API", version: "2.0.0" });
-});
+// 1. Body Parser Middleware (Заавал хамгийн дээр байна)[cite: 39, 47]
+app.use(express.json());
 
-// Health route
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", uptime: process.uptime() });
-});
+// 2. Custom Logger Middleware[cite: 44, 47]
+app.use(logger);
 
-// ==================== BOOKS ROUTES ====================
+// 3. Router-үүд[cite: 47]
+app.use("/books", booksRouter);
 
-// 1. БҮХ НОМЫГ АВАХ БОЛОН ХАЙЛТ (Async / Query params)
-app.get("/books", async (req, res) => {
-  const q = req.query.q;
+// 4. 404 ба Error Handlers (Заавал хамгийн доор байна)[cite: 47, 48]
+app.use(notFound);
+app.use(errorHandler);
 
-  if (q) {
-    return res.json(searchByTitle(q));
-  }
-
-  const allBooks = await getBooksFromDb();
-  res.json(allBooks);
-});
-
-// 2. НЭГ НОМЫГ ID-ГААР АВАХ (Async / Params + Try-Catch алдаа барих)
-app.get("/books/:id", (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const book = getBookOrThrow(id);
-    res.json(book);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-});
-
-// ==================== USERS ROUTES ====================
-
-// 3. БҮХ ХЭРЭГЛЭГЧДИЙГ АВАХ (Нууц үгийг хасаж буцаана)
-app.get("/users", (req, res) => {
-  const safeUsers = users.map(({ password, ...userWithoutPassword }) => userWithoutPassword);
-  res.json(safeUsers);
-});
-
-// 4. НЭГ ХЭРЭГЛЭГЧИЙГ ID-ГААР АВАХ (404 шалгалт болон Rest operator-оор password хасна)
-app.get("/users/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const user = findUserById(id);
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  // Rest operator ашиглан password-ийг хасаж байна
-  const { password, ...userWithoutPassword } = user;
-  res.json(userWithoutPassword);
-});
-
-// Сервер ажиллуулах
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
