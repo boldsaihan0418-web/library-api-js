@@ -1,22 +1,35 @@
-// Хэрэглэгчдийн өгөгдөл
 export const users = [
-  { id: 1, name: "Bat", email: "bat@example.com", role: "ADMIN", password: "secretPassword1" },
-  { id: 2, name: "Sarnai", email: "sarnai@example.com", role: "USER", password: "secretPassword2" },
-  { id: 3, name: "Tuguldur", email: "tuguldur@example.com", role: "USER", password: "secretPassword3" },
-  { id: 4, name: "Anu", email: "anu@example.com", role: "ADMIN", password: "secretPassword4" }
+  { id: 1, name: "Bat", email: "bat@example.com", role: "ADMIN", password: "123" },
+  { id: 2, name: "Sarnai", email: "sarnai@example.com", role: "USER", password: "456" }
 ];
 
-// ID-гаар хэрэглэгч олох
+let nextUserId = 3;
+
 export function findUserById(id) {
-  return users.find((user) => user.id === id);
+  return users.find((u) => u.id === id);
 }
 
-// Имэйлээр хэрэглэгч олох
 export function findByEmail(email) {
-  return users.find((user) => user.email === email);
+  return users.find((u) => u.email === email);
 }
 
-// Админ хэрэглэгчдийг тоолох
-export function countAdmins() {
-  return users.filter((user) => user.role === "ADMIN").length;
+export function addUser(input) {
+  const user = { id: nextUserId++, ...input };
+  users.push(user);
+  return user;
+}
+
+export function updateUser(id, changes) {
+  const user = findUserById(id);
+  if (!user) return null;
+  if (changes.id) delete changes.id;
+  Object.assign(user, changes);
+  return user;
+}
+
+export function removeUser(id) {
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return false;
+  users.splice(index, 1);
+  return true;
 }
