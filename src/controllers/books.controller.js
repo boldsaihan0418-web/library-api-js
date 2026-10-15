@@ -3,53 +3,51 @@ import {
   findBookById,
   addBook,
   updateBook,
-  removeBook
+  removeBook,
+  searchByTitle
 } from "../data/books.js";
 
-// GET /books - Жагсаалт авах[cite: 46]
+// 1. list гэж EXPORT хийсэн байх ёстой
 export function list(req, res) {
-  res.json({
-    count: books.length,
-    data: books
-  });
+  res.json({ count: books.length, data: books });
 }
 
-// GET /books/:id - Нэг ном авах[cite: 46]
+// 2. search гэж EXPORT хийсэн байх ёстой
+export function search(req, res) {
+  const q = req.query.q;
+  if (!q) return res.json(books);
+  const results = searchByTitle(q);
+  res.json(results);
+}
+
+// 3. getOne гэж EXPORT хийсэн байх ёстой[cite: 46, 49]
 export function getOne(req, res) {
   const id = Number(req.params.id);
   const book = findBookById(id);
-  if (!book) {
-    return res.status(404).json({ message: "Book not found" });
-  }
+  if (!book) return res.status(404).json({ message: "Book not found" });
   res.json(book);
 }
 
-// POST /books - Шинэ ном үүсгэх[cite: 40, 46]
+// 4. create[cite: 46, 49]
 export function create(req, res) {
   const { title, price } = req.body;
-  if (!title) {
-    return res.status(400).json({ message: "title is required" }); // Validation[cite: 40]
-  }
+  if (!title) return res.status(400).json({ message: "title is required" });
   const book = addBook({ title, price });
-  res.status(201).json(book); // 201 Created Status[cite: 40]
+  res.status(201).json(book);
 }
 
-// PATCH /books/:id - Ном засах[cite: 41, 46]
+// 5. update[cite: 46, 49]
 export function update(req, res) {
   const id = Number(req.params.id);
   const updated = updateBook(id, req.body);
-  if (!updated) {
-    return res.status(404).json({ message: "Book not found" });
-  }
+  if (!updated) return res.status(404).json({ message: "Book not found" });
   res.json(updated);
 }
 
-// DELETE /books/:id - Ном устгах[cite: 42, 46]
+// 6. remove[cite: 46, 49]
 export function remove(req, res) {
   const id = Number(req.params.id);
   const ok = removeBook(id);
-  if (!ok) {
-    return res.status(404).json({ message: "Book not found" });
-  }
-  res.status(204).send(); // 204 No Content[cite: 42]
+  if (!ok) return res.status(404).json({ message: "Book not found" });
+  res.status(204).send();
 }

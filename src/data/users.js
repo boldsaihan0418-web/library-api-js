@@ -1,6 +1,6 @@
 export const users = [
-  { id: 1, name: "Bat", email: "bat@example.com", role: "ADMIN", password: "123" },
-  { id: 2, name: "Sarnai", email: "sarnai@example.com", role: "USER", password: "456" }
+  { id: 1, name: "Bat", email: "bat@gmail.com", role: "ADMIN", password: "123" },
+  { id: 2, name: "Sarnai", email: "sarnai@gmail.com", role: "USER", password: "456" }
 ];
 
 let nextUserId = 3;

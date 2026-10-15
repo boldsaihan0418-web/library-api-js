@@ -5,22 +5,23 @@ import { logger } from "./middlewares/logger.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
 
 const app = express();
-const PORT = 3000;
 
-// 1. Body Parser Middleware (Заавал хамгийн дээр байна)[cite: 39, 47]
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to Library API", version: "1.0.0" });
+});
+
 app.use(express.json());
-
-// 2. Custom Logger Middleware[cite: 44, 47]
 app.use(logger);
 
-// 3. Router-үүд (Books болон Users)[cite: 47]
 app.use("/books", booksRouter);
 app.use("/users", usersRouter);
 
-// 4. 404 ба Error Handlers (Заавал хамгийн доор байна)[cite: 47, 48]
 app.use(notFound);
 app.use(errorHandler);
 
+const PORT = process.env.PORT || 3000;
+g
 app.listen(PORT, () => {
+
   console.log(`Server running on http://localhost:${PORT}`);
 });
